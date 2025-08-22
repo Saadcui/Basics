@@ -5,15 +5,35 @@ import bcrypt from "bcrypt";
 import connectDB from "./config/db.js";
 import User from "./models/User.js";
 import Password from "./models/Password.js";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
+
 dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:8081", "https://backend-6nifct3eb-saads-projects-dbff955f.vercel.app"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+
+// Handle preflight explicitly
+app.options("*", cors());
+
 app.use(bodyParser.json());
 
-connectDB();
+// Connect DB (only if env is set)
+if (process.env.MONGO_URL) {
+  connectDB();
+} else {
+  console.error("MONGO_URL not found in environment variables");
+}
+
+// Health check route
+app.get("/", (req, res) => {
+  res.json({ message: "Backend is working ✅" });
+});
 
 // Signup
 app.post("/api/auth/signup", async (req, res) => {
@@ -33,7 +53,9 @@ app.post("/api/auth/signup", async (req, res) => {
     const newUser = new User({ username, email, password: hashedPassword });
 
     await newUser.save();
-    res.status(201).json({ message: "User created successfully", userId: newUser._id });
+    res
+      .status(201)
+      .json({ message: "User created successfully", userId: newUser._id });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
@@ -45,10 +67,12 @@ app.post("/api/auth/login", async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: "Invalid email or password" });
+    if (!user)
+      return res.status(400).json({ error: "Invalid email or password" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ error: "Invalid email or password" });
+    if (!isMatch)
+      return res.status(400).json({ error: "Invalid email or password" });
 
     res.status(200).json({
       message: "Login successful",
@@ -63,7 +87,7 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-// Get Passwords by userId (via query param)
+// Get Passwords by userId
 app.get("/passwords", async (req, res) => {
   const { userId } = req.query;
 
@@ -82,7 +106,9 @@ app.post("/passwords", async (req, res) => {
   const { userId, description, password } = req.body;
 
   if (!userId || !description || !password) {
-    return res.status(400).json({ message: "userId, description and password are required" });
+    return res
+      .status(400)
+      .json({ message: "userId, description and password are required" });
   }
 
   try {
@@ -94,7 +120,7 @@ app.post("/passwords", async (req, res) => {
   }
 });
 
-// Delete Password by ID
+// Delete Password
 app.delete("/passwords/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -105,4 +131,5 @@ app.delete("/passwords/:id", async (req, res) => {
   }
 });
 
-module.exports = app;
+// Export app (important for Vercel)
+export default app;
