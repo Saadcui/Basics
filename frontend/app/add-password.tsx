@@ -1,24 +1,40 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { usePasswords } from "../context/PasswordContext";
+import { useLocalSearchParams } from "expo-router";
 
 export default function AddPassword() {
   const router = useRouter();
-  const { addPassword } = usePasswords();
   const [description, setDescription] = useState("");
   const [password, setPassword] = useState("");
+  const { userId } = useLocalSearchParams(); // grab userId from URL
 
-  const handleAdd = () => {
-    if (!description || !password) return;
 
-    addPassword({ description, password });
+  const handleAdd = async () => {
+    if (!description || !password || !userId) return;
 
-    setDescription("");
-    setPassword("");
+    try {
+      const response = await fetch('http://localhost:5000/passwords', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description, password, userId }), 
+      });
 
-    router.push("/dashboard");
-  };
+    if (!response.ok) {
+      const error = await response.json();
+      alert('Error: ' + error.message);
+      return;
+    }
+
+    // Clear form & navigate
+    setDescription('');
+    setPassword('');
+    router.push({ pathname: '/dashboard', params: { userId } });
+  } catch (err) {
+    alert('Failed to add password. ' + err );
+  }
+};
+
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Add a New Password</Text>

@@ -1,16 +1,60 @@
-import { Ionicons } from "@expo/vector-icons"; // for eye icon
+import { Ionicons } from "@expo/vector-icons";
 import * as LocalAuthentication from "expo-local-authentication";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { usePasswords } from "../context/PasswordContext";
+import { useEffect, useState } from "react";
+import { useLocalSearchParams } from "expo-router";
+
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+type PasswordEntry = {
+  _id: string;
+  description: string;
+  password: string;
+};
 
 export default function Dashboard() {
-  const { passwords, removePassword } = usePasswords();
   const router = useRouter();
+  const [passwords, setPasswords] = useState<PasswordEntry[]>([]);
   const [visibleIndex, setVisibleIndex] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // 🔒 Authentication function
+  const { userId } = useLocalSearchParams(); 
+
+  const fetchPasswords = async () => {
+    try {
+      if (!userId) {
+        alert("No user ID found. Please log in.");
+        router.replace("/login");
+        return;
+      }
+
+      const res = await fetch(`http://localhost:5000/passwords?userId=${userId}`);
+
+      if (!res.ok) {
+        const error = await res.json();
+        alert("Failed to fetch: " + error.message);
+        return;
+      }
+
+      const data = await res.json();
+      setPasswords(data);
+    } catch (err) {
+      alert("Failed to fetch passwords: " + err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPasswords();
+  }, []);
+
   const authenticate = async (index: number) => {
     const result = await LocalAuthentication.authenticateAsync({
       promptMessage: "Authenticate to view password",
@@ -24,15 +68,35 @@ export default function Dashboard() {
     }
   };
 
+  const deletePassword = async (id: string, index: number) => {
+    try {
+      const res = await fetch(`http://localhost:5000/passwords/${id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setPasswords((prev) => prev.filter((_, i) => i !== index));
+        if (visibleIndex === index) setVisibleIndex(null);
+      } else {
+        alert("Failed to delete password");
+      }
+    } catch (err) {
+      alert("Error deleting password: " + err);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Saved Passwords</Text>
-      {passwords.length === 0 ? (
+
+      {loading ? (
+        <Text>Loading...</Text>
+      ) : passwords.length === 0 ? (
         <Text style={styles.empty}>No passwords added yet</Text>
       ) : (
         <FlatList
           data={passwords}
-          keyExtractor={(_, index) => index.toString()}
+          keyExtractor={(item) => item._id}
           renderItem={({ item, index }) => (
             <View style={styles.item}>
               <Text style={styles.desc}>{item.description}</Text>
@@ -42,7 +106,15 @@ export default function Dashboard() {
                   {visibleIndex === index ? item.password : "••••••••"}
                 </Text>
 
-                <TouchableOpacity onPress={() => authenticate(index)}>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (visibleIndex === index) {
+                      setVisibleIndex(null);
+                    } else {
+                      authenticate(index);
+                    }
+                  }}
+                >
                   <Ionicons
                     name={visibleIndex === index ? "eye-off" : "eye"}
                     size={24}
@@ -53,7 +125,7 @@ export default function Dashboard() {
 
               <TouchableOpacity
                 style={styles.deleteBtn}
-                onPress={() => removePassword(index)}
+                onPress={() => deletePassword(item._id, index)}
               >
                 <Text style={styles.deleteText}>Delete</Text>
               </TouchableOpacity>
@@ -64,9 +136,8 @@ export default function Dashboard() {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => {
-          router.push("/add-password");
-        }}
+// In your Dashboard component
+      onPress={() => router.push({ pathname: '/add-password', params: { userId } })}
       >
         <Text style={styles.buttonText}>Add New Password</Text>
       </TouchableOpacity>
