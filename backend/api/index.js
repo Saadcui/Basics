@@ -1,5 +1,5 @@
 
-import app from "../backend/index.js";
+import app from "../index";
 import { createServer } from "@vercel/node";
 
 export default createServer(app);
