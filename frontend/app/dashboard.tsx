@@ -34,7 +34,7 @@ export default function Dashboard() {
         return;
       }
 
-      const res = await fetch(`https://backend-6nifct3eb-saads-projects-dbff955f.vercel.app/passwords?userId=${userId}`);
+      const res = await fetch(`http://localhost:5000/passwords?userId=${userId}`);
 
       if (!res.ok) {
         const error = await res.json();

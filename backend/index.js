@@ -11,29 +11,16 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-  origin: ["http://localhost:8081", "https://backend-6nifct3eb-saads-projects-dbff955f.vercel.app"],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
-}));
-
-// Handle preflight explicitly
-app.options("*", cors());
+app.use(cors());
 
 app.use(bodyParser.json());
 
-// Connect DB (only if env is set)
-if (process.env.MONGO_URL) {
+if (process.env.MONGO_URI) {
   connectDB();
 } else {
-  console.error("MONGO_URL not found in environment variables");
+  console.error("MONGO_URI not found in environment variables");
 }
 
-// Health check route
-app.get("/", (req, res) => {
-  res.json({ message: "Backend is working ✅" });
-});
 
 // Signup
 app.post("/api/auth/signup", async (req, res) => {
@@ -131,5 +118,6 @@ app.delete("/passwords/:id", async (req, res) => {
   }
 });
 
-// Export app (important for Vercel)
-export default app;
+app.listen(5000,()=>{
+  console.log('server is running')
+})

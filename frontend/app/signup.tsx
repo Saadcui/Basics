@@ -28,7 +28,7 @@ export default function SignUp() {
     }
 
     try {
-      const response = await fetch("https://backend-6nifct3eb-saads-projects-dbff955f.vercel.app/api/auth/signup", {
+      const response = await fetch("http://localhost:5000/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: UserName, email, password }),
