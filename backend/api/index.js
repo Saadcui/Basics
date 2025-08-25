@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-app.post("/api/signup", async (req, res) => {
+app.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
@@ -67,8 +67,8 @@ app.post("/api/signup", async (req, res) => {
   }
 });
 
-// Login
-app.post("/api/login", async (req, res) => {
+// Logina
+app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -94,7 +94,7 @@ app.post("/api/login", async (req, res) => {
 });
 
 // Get Passwords by userId
-app.get("/api/passwords", async (req, res) => {
+app.get("/passwords", async (req, res) => {
   const { userId } = req.query;
 
   if (!userId) return res.status(400).json({ error: "userId is required" });
@@ -108,7 +108,7 @@ app.get("/api/passwords", async (req, res) => {
 });
 
 // Add Password
-app.post("/api/passwords", async (req, res) => {
+app.post("/passwords", async (req, res) => {
   const { userId, description, password } = req.body;
 
   if (!userId || !description || !password) {
@@ -127,7 +127,7 @@ app.post("/api/passwords", async (req, res) => {
 });
 
 // Delete Password
-app.delete("/api/passwords/:id", async (req, res) => {
+app.delete("/passwords/:id", async (req, res) => {
   try {
     const { id } = req.params;
     await Password.findByIdAndDelete(id);
