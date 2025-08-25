@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
+import serverless from "serverless-http"; 
+
 import bcrypt from "bcrypt";
 import connectDB from "./config/db.js";
 import User from "./models/User.js";
@@ -126,13 +128,13 @@ app.delete("/api/passwords/:id", async (req, res) => {
   }
 });
 
-app.listen(5000,()=>{
-  console.log('server is running')
-})
-
 
 
 app.use((req, res) => {
   console.log(`Unknown route: ${req.method} ${req.originalUrl}`);
   res.status(404).send('Route not found');
 });
+
+
+
+export default serverless(app);
