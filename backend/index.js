@@ -23,6 +23,10 @@ if (process.env.MONGO_URI) {
 
 
 // Signup
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
+
 app.post("/api/auth/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;

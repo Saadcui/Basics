@@ -14,7 +14,7 @@ export default function AddPassword() {
     if (!description || !password || !userId) return;
 
     try {
-      const response = await fetch('http://localhost:5000/passwords', {
+      const response = await fetch('https://basics-one-jade.vercel.app/passwords', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ description, password, userId }), 

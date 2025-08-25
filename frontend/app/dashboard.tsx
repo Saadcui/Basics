@@ -34,7 +34,7 @@ export default function Dashboard() {
         return;
       }
 
-      const res = await fetch(`http://localhost:5000/passwords?userId=${userId}`);
+      const res = await fetch(`https://basics-one-jade.vercel.app/passwords?userId=${userId}`);
 
       if (!res.ok) {
         const error = await res.json();
@@ -70,7 +70,7 @@ export default function Dashboard() {
 
   const deletePassword = async (id: string, index: number) => {
     try {
-      const res = await fetch(`http://localhost:5000/passwords/${id}`, {
+      const res = await fetch(`https://basics-one-jade.vercel.app/passwords/${id}`, {
         method: "DELETE",
       });
 
