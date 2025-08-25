@@ -33,11 +33,11 @@ if (process.env.MONGO_URI) {
 
 
 // Signup
-app.get("/", (req, res) => {
+app.get("/api/", (req, res) => {
   res.send("API is running...");
 });
 
-app.post("/signup", async (req, res) => {
+app.post("/api/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
@@ -63,7 +63,7 @@ app.post("/signup", async (req, res) => {
 });
 
 // Logina
-app.post("/login", async (req, res) => {
+app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
