@@ -11,7 +11,11 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: '*', // or use your React Native dev origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 app.use(bodyParser.json());
 
@@ -125,3 +129,10 @@ app.delete("/passwords/:id", async (req, res) => {
 app.listen(5000,()=>{
   console.log('server is running')
 })
+
+
+
+app.use((req, res) => {
+  console.log(`Unknown route: ${req.method} ${req.originalUrl}`);
+  res.status(404).send('Route not found');
+});
