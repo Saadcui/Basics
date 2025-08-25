@@ -22,6 +22,9 @@ app.use(
   })
 );
 
+app.options("*", cors()); // <- Add this
+
+
 
 app.use(bodyParser.json());
 
