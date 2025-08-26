@@ -13,26 +13,7 @@ dotenv.config();
 const app = express();
 
 
-app.use(cors({
-  origin: "basics-9esq2cd3b-saads-projects-dbff955f.vercel.app",
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
-
-
-// Explicitly handle OPTIONS requests (preflight)
-app.use((req, res, next) => {
-  if (req.method === "OPTIONS") {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.header("Access-Control-Allow-Credentials", "true");
-    return res.sendStatus(200);
-  }
-  next();
-});
-
+app.use(cors());
 
 app.use(bodyParser.json());
 
@@ -145,6 +126,8 @@ app.delete("/passwords/:id", async (req, res) => {
 
 
 
+
+
 app.use((req, res) => {
   console.log(`Unknown route: ${req.method} ${req.originalUrl}`);
   res.status(404).send('Route not found');
@@ -152,4 +135,7 @@ app.use((req, res) => {
 
 
 
-export default app;
+
+app.listen(5000, () => {
+  console.log("Server is running on port 5000");
+});
