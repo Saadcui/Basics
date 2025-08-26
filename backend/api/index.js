@@ -15,11 +15,12 @@ const app = express();
 
 
 app.use(cors({
-  origin: "*",
+  origin: "basics-9esq2cd3b-saads-projects-dbff955f.vercel.app",
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
 }));
+
 
 // Explicitly handle OPTIONS requests (preflight)
 app.use((req, res, next) => {
