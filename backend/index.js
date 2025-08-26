@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import serverless from "serverless-http"; 
 
 import bcrypt from "bcrypt";
 import connectDB from "./config/db.js";
@@ -153,4 +152,4 @@ app.use((req, res) => {
 
 
 
-export default serverless(app);
+export default app;
